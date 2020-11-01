@@ -1,44 +1,494 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Java的嵌套类和内部类 - QueinDecim</title>
-<base href="/">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-<link rel="canonical" href="https://magi003769.github.io/post/%E5%B5%8C%E5%A5%97%E7%B1%BB%E5%92%8C%E5%86%85%E9%83%A8%E7%B1%BB/">
-<link rel="icon" type="image/x-icon" href="/avatar/256x256bb.jpg">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
 
-<meta name="description" content="讨论一下嵌套类和内部类的概念。这两个东西有区别，但联系非常紧密，有的时候面试可能会作为基础知识问到。">
-<meta property="og:type" content="website">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-doge.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-doge.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"magi003769.github.io","root":"/","scheme":"Gemini","version":"8.0.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"sidebar":"fadeIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}};
+  </script>
+
+  <meta name="description" content="讨论一下嵌套类和内部类的概念。这两个东西有区别，但联系非常紧密，有的时候面试可能会作为基础知识问到。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Java的嵌套类和内部类">
 <meta property="og:url" content="https://magi003769.github.io/post/%E5%B5%8C%E5%A5%97%E7%B1%BB%E5%92%8C%E5%86%85%E9%83%A8%E7%B1%BB/index.html">
 <meta property="og:site_name" content="QueinDecim">
 <meta property="og:description" content="讨论一下嵌套类和内部类的概念。这两个东西有区别，但联系非常紧密，有的时候面试可能会作为基础知识问到。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://post-pic.nos-eastchina1.126.net/header_imgs/about-4.jpg">
 <meta property="article:published_time" content="2019-08-03T07:00:00.000Z">
-<meta property="article:modified_time" content="2020-05-24T10:04:14.662Z">
+<meta property="article:modified_time" content="2020-11-01T19:30:42.933Z">
 <meta property="article:author" content="Jeff Wong">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="嵌套类">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://post-pic.nos-eastchina1.126.net/header_imgs/about-4.jpg">
 
 
-<link href="//fonts.googleapis.com/css?family=Baloo+Bhaijaan|Inconsolata|Josefin+Sans|Montserrat" rel="stylesheet">
-<link href="/styles.e4c22be5bb2c26eab146.css" rel="stylesheet">
-
-<link rel="stylesheet" href="/theme.2ebab4f24f0c1824c162.css" is="theme">
+<link rel="canonical" href="https://magi003769.github.io/post/%E5%B5%8C%E5%A5%97%E7%B1%BB%E5%92%8C%E5%86%85%E9%83%A8%E7%B1%BB/">
 
 
-<script src="/config.c12e8ee59e0053a6e51b.js"></script>
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Java的嵌套类和内部类 | QueinDecim</title>
+  
 
 
-<meta name="generator" content="Hexo 4.2.0"></head>
-<body lang="en">
-<is-a></is-a>
-<script src="/runtime.1720a40670866f12654e.js"></script>
-<script src="/polyfills.69a7b8a907a7ac9da988.js"></script>
-<script src="/main.12c3a04fa47641f902c2.js"></script>
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">QueinDecim</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">God in his heaven all's right with the world</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E5%8C%BA%E5%88%86"><span class="nav-number">1.</span> <span class="nav-text">概念区分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B5%8C%E5%A5%97%E7%B1%BB%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">嵌套类的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%B5%8C%E5%A5%97%E7%B1%BB"><span class="nav-number">2.1.</span> <span class="nav-text">静态嵌套类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%9E%E9%9D%99%E6%80%81%E5%B5%8C%E5%A5%97%E7%B1%BB"><span class="nav-number">2.2.</span> <span class="nav-text">非静态嵌套类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E7%B1%BB"><span class="nav-number">2.3.</span> <span class="nav-text">局部类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%BF%E5%90%8D%E7%B1%BB"><span class="nav-number">2.4.</span> <span class="nav-text">匿名类</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E7%B1%BB%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="nav-number">3.</span> <span class="nav-text">内部类的好处</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Summary"><span class="nav-number">4.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeff Wong"
+      src="/images/spike_smoke.jpg">
+  <p class="site-author-name" itemprop="name">Jeff Wong</p>
+  <div class="site-description" itemprop="description">本当の声は いつだって 正しい道を照らしてる</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">74</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MAGI003769" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MAGI003769" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/ruihao.wang.777" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;ruihao.wang.777" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.instagram.com/jeffwooong/" title="Instagram → https:&#x2F;www.instagram.com&#x2F;jeffwooong&#x2F;" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/p/1005052622574043/home?from=page_100505&mod=TAB#place" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052622574043&#x2F;home?from&#x3D;page_100505&amp;mod&#x3D;TAB#place" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://magi003769.github.io/post/%E5%B5%8C%E5%A5%97%E7%B1%BB%E5%92%8C%E5%86%85%E9%83%A8%E7%B1%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/spike_smoke.jpg">
+      <meta itemprop="name" content="Jeff Wong">
+      <meta itemprop="description" content="本当の声は いつだって 正しい道を照らしてる">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="QueinDecim">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java的嵌套类和内部类
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-08-03 00:00:00" itemprop="dateCreated datePublished" datetime="2019-08-03T00:00:00-07:00">2019-08-03</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2020-11-01 11:30:42" itemprop="dateModified" datetime="2020-11-01T11:30:42-08:00">2020-11-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>讨论一下嵌套类和内部类的概念。这两个东西有区别，但联系非常紧密，有的时候面试可能会作为基础知识问到。</p>
+<a id="more"></a>
+<h1 id="概念区分"><a href="#概念区分" class="headerlink" title="概念区分"></a>概念区分</h1><blockquote>
+<p><strong>Terminology:</strong> Nested classes are divided into two categories: static and non-static. Nested classes that are declared <code>static</code> are called <em>static nested classes</em>. Non-static nested classes are called <em>inner classes</em>.</p>
+</blockquote>
+<p>上面是Oracle Java文档给出的定义。<strong>嵌套类</strong>是一个统称，代指所有定义在其他类里面的类。而嵌套类又分成两种：静态与非静态。有<code>static</code>修饰的类被称为静态嵌套类，而非静态的嵌套类则被称为<strong>内部类</strong>。</p>
+<h1 id="嵌套类的分类"><a href="#嵌套类的分类" class="headerlink" title="嵌套类的分类"></a>嵌套类的分类</h1><p>如果细分的话，除了以上两类嵌套类，还可以再补充两种类型。这样总计是4中不同的嵌套类，分别是：</p>
+<ul>
+<li>静态嵌套类</li>
+<li>非静态嵌套类</li>
+<li>局部类</li>
+<li>匿名类</li>
+</ul>
+<h2 id="静态嵌套类"><a href="#静态嵌套类" class="headerlink" title="静态嵌套类"></a>静态嵌套类</h2><p>这种嵌套类定义在其他类内部，有<code>static</code>关键字修饰。因此，他可以直接使用自身的构造器来创建实例，不依赖于外部类的实例。我们甚至可以将它看作是一个普通类，只不过恰好定义在其他类内部。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OuterClass.InnerClass obj = <span class="keyword">new</span> OuterClass.InnerClass();</span><br></pre></td></tr></table></figure>
+<p>也正是因为没有了这样的依赖关系，静态嵌套类不能访问外部类的成员变量或者方法。而在创建外部类实例的时候，静态嵌套类实际上是不会被创建出实例的。这样的静态嵌套类对于外部类来说，简直就和定义在外部没有什么区别。所以<strong>静态嵌套类内部是可以有静态成员</strong>。</p>
+<h2 id="非静态嵌套类"><a href="#非静态嵌套类" class="headerlink" title="非静态嵌套类"></a>非静态嵌套类</h2><p>非静态嵌套类，也就是内部类，没有<code>static</code>修饰。它们可以访问外部类的成员，也就是说这样的内部类依赖于外部类。所以，对于非静态嵌套类，它与它的外部类之间有着非常强的联系。它的实例中实际上有一个隐含的引用指向它的外部类实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OuterClass</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> a;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> b;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OuterClass</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.a = a;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getA</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InnerClass</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a + b;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a - b;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        OuterClass calc = <span class="keyword">new</span> OuterClass(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        OuterClass.Operator op = calc.<span class="function">new <span class="title">InnerClass</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意这里的实例构造语法，我们需要先创建一个外部类实例，再通过这个实例调用内部类的构造器来创建内部类的实例。这个内部类前面的<code>public</code>关键字，有没有其实并不影响可见性。</p>
+<h2 id="局部类"><a href="#局部类" class="headerlink" title="局部类"></a>局部类</h2><p>前面两类嵌套类都是作为<strong>成员</strong>，生命在外部类的内部。而局部类则类似于局部变量，它被定义在<strong>外部类方法的内部</strong>。比如在使用<code>PriorityQueue</code>的时候，我们会根据需要制定排序规则。这时就会临时定义一个<code>Comparator</code>类。比如下面我们就可以通过定义一个新的<code>MyComparator</code>类来继承<code>Comparator</code>类，从而将优先队列默认的最小堆模式变成最大堆。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TryInnerClass</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="class"><span class="keyword">class</span> <span class="title">MyComparator</span> <span class="keyword">implements</span> <span class="title">Comparator</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer o1, Integer o2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> o2 - o1;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;Integer&gt; nums = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">            nums.add(i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        PriorityQueue&lt;Integer&gt; minHeap = <span class="keyword">new</span> PriorityQueue&lt;&gt;();</span><br><span class="line">        PriorityQueue&lt;Integer&gt; maxHeap = <span class="keyword">new</span> PriorityQueue&lt;&gt;(<span class="keyword">new</span> myComparator());</span><br><span class="line"></span><br><span class="line">        minHeap.addAll(nums);</span><br><span class="line">        maxHeap.addAll(nums);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;minHeap: &quot;</span>);</span><br><span class="line">        <span class="comment">// Output: 0, 1, 2, 3, 4</span></span><br><span class="line">        <span class="keyword">while</span>(minHeap.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.print(minHeap.poll() + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;\nmaxHeap: &quot;</span>);</span><br><span class="line">        <span class="comment">// Output: 4, 3, 2, 1, 0</span></span><br><span class="line">        <span class="keyword">while</span>(maxHeap.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.print(maxHeap.poll() + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="匿名类"><a href="#匿名类" class="headerlink" title="匿名类"></a>匿名类</h2><p>还是以上面的<code>Comparator</code>为例，还有一种方式来定义优先队列的比较规则，即使用匿名类。顾名思义，匿名类没有名字。我们可以看到，这样的类只有在使用时才会被定义并实例化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PriorityQueue&lt;Integer&gt; maxHeap = <span class="keyword">new</span> PriorityQueue&lt;&gt;(<span class="keyword">new</span> Comparator&lt;Integer&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer o1, Integer o2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> o2 - o1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>匿名类常见用法：动态的常见函数对象（EffectiveJava，Item21），例如事件监听器；创建过程对象，比如Runnable、Thread或者TimerTask。还有就是静态工厂方法内部，ruturn new XXX();(EffectiveJava，Item18)</p>
+<h1 id="内部类的好处"><a href="#内部类的好处" class="headerlink" title="内部类的好处"></a>内部类的好处</h1><ol>
+<li>Java不允许多继承，但是可以在一个外部类中包含多个内部类，每个内部类实现一个继承。这样就相当于变相的实现了多继承。</li>
+<li>可以让开发者更好的控制类之间的可见性。</li>
+<li>方便编写多线程的代码。</li>
+<li>方便对接口进行自由的定义。</li>
+</ol>
+<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><ul>
+<li>静态嵌套类，不依赖于外部类，不能访问外部类的非静态成员</li>
+<li>非静态嵌套类（内部类），依赖于外部类的实例调用构造器进行初始化，可以访问</li>
+<li>局部类，类似局部变量，定义在外部类方法的内部</li>
+<li>匿名类，没有实际的名字，只在使用时定义和实例化</li>
+</ul>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html">Java Tutorial - Access Control</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/45241466">Java中的嵌套类</a></p>
+</li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b7f9c806b3aa">wangcanfeng - Java嵌套类</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+              <a href="/tags/%E5%B5%8C%E5%A5%97%E7%B1%BB/" rel="tag"><i class="fa fa-tag"></i> 嵌套类</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/Java%E5%85%A5%E9%97%A8/" rel="prev" title="Java入门基础概念">
+                  <i class="fa fa-chevron-left"></i> Java入门基础概念
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/%E6%8E%A5%E5%8F%A3%E5%92%8C%E6%8A%BD%E8%B1%A1%E7%B1%BB/" rel="next" title="Java面向对象">
+                  Java面向对象 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-bolt"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href="https://magi003769.github.io/"><b>Jeff Wong</b></a></span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
 </body>
 </html>

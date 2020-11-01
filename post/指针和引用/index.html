@@ -1,21 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>C++入门到放弃——指针和引用 - QueinDecim</title>
-<base href="/">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-<link rel="canonical" href="https://magi003769.github.io/post/%E6%8C%87%E9%92%88%E5%92%8C%E5%BC%95%E7%94%A8/">
-<link rel="icon" type="image/x-icon" href="/avatar/256x256bb.jpg">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
 
-<meta name="description" content="引用（Reference） A reference defines an alternative name for an object  引用实际上并不是一个对象，它只是给已有的变量赋予了另外一个名字。当我们初始化一个变量时，我们会将initializer的值复制给这个我们正在创造的对象。而当我们初始化一个引用的时候，我们是将其initializer的引用和我们正在生成的引用绑定在一起。一旦引用被">
-<meta property="og:type" content="website">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-doge.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-doge.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"magi003769.github.io","root":"/","scheme":"Gemini","version":"8.0.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"sidebar":"fadeIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}};
+  </script>
+
+  <meta name="description" content="引用（Reference） A reference defines an alternative name for an object  引用实际上并不是一个对象，它只是给已有的变量赋予了另外一个名字。当我们初始化一个变量时，我们会将initializer的值复制给这个我们正在创造的对象。而当我们初始化一个引用的时候，我们是将其initializer的引用和我们正在生成的引用绑定在一起。一旦引用被">
+<meta property="og:type" content="article">
 <meta property="og:title" content="C++入门到放弃——指针和引用">
 <meta property="og:url" content="https://magi003769.github.io/post/%E6%8C%87%E9%92%88%E5%92%8C%E5%BC%95%E7%94%A8/index.html">
 <meta property="og:site_name" content="QueinDecim">
 <meta property="og:description" content="引用（Reference） A reference defines an alternative name for an object  引用实际上并不是一个对象，它只是给已有的变量赋予了另外一个名字。当我们初始化一个变量时，我们会将initializer的值复制给这个我们正在创造的对象。而当我们初始化一个引用的时候，我们是将其initializer的引用和我们正在生成的引用绑定在一起。一旦引用被">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://magi003769.github.io/avatar/smoke.jpg">
+<meta property="og:image" content="http://post-pic.nos-eastchina1.126.net/LeetCode/%E6%8D%95%E8%8E%B7.PNG">
 <meta property="article:published_time" content="2018-03-08T03:55:30.000Z">
 <meta property="article:modified_time" content="2019-05-04T04:33:06.000Z">
 <meta property="article:author" content="Jeff Wong">
@@ -23,23 +40,453 @@
 <meta property="article:tag" content="Reference">
 <meta property="article:tag" content="C++Prime">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://magi003769.github.io/avatar/smoke.jpg">
+<meta name="twitter:image" content="http://post-pic.nos-eastchina1.126.net/LeetCode/%E6%8D%95%E8%8E%B7.PNG">
 
 
-<link href="//fonts.googleapis.com/css?family=Baloo+Bhaijaan|Inconsolata|Josefin+Sans|Montserrat" rel="stylesheet">
-<link href="/styles.e4c22be5bb2c26eab146.css" rel="stylesheet">
-
-<link rel="stylesheet" href="/theme.2ebab4f24f0c1824c162.css" is="theme">
+<link rel="canonical" href="https://magi003769.github.io/post/%E6%8C%87%E9%92%88%E5%92%8C%E5%BC%95%E7%94%A8/">
 
 
-<script src="/config.c12e8ee59e0053a6e51b.js"></script>
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++入门到放弃——指针和引用 | QueinDecim</title>
+  
 
 
-<meta name="generator" content="Hexo 4.2.0"></head>
-<body lang="en">
-<is-a></is-a>
-<script src="/runtime.1720a40670866f12654e.js"></script>
-<script src="/polyfills.69a7b8a907a7ac9da988.js"></script>
-<script src="/main.12c3a04fa47641f902c2.js"></script>
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">QueinDecim</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">God in his heaven all's right with the world</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8%EF%BC%88Reference%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">引用（Reference）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%87%E9%92%88%EF%BC%88Pointer%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">指针（Pointer）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E8%BF%90%E7%AE%97%E7%AC%A6%EF%BC%9A-amp-and"><span class="nav-number">3.</span> <span class="nav-text">两个运算符：&amp; and *</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeff Wong"
+      src="/images/spike_smoke.jpg">
+  <p class="site-author-name" itemprop="name">Jeff Wong</p>
+  <div class="site-description" itemprop="description">本当の声は いつだって 正しい道を照らしてる</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">74</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MAGI003769" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MAGI003769" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/ruihao.wang.777" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;ruihao.wang.777" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.instagram.com/jeffwooong/" title="Instagram → https:&#x2F;www.instagram.com&#x2F;jeffwooong&#x2F;" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/p/1005052622574043/home?from=page_100505&mod=TAB#place" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052622574043&#x2F;home?from&#x3D;page_100505&amp;mod&#x3D;TAB#place" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://magi003769.github.io/post/%E6%8C%87%E9%92%88%E5%92%8C%E5%BC%95%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/spike_smoke.jpg">
+      <meta itemprop="name" content="Jeff Wong">
+      <meta itemprop="description" content="本当の声は いつだって 正しい道を照らしてる">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="QueinDecim">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++入门到放弃——指针和引用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-03-07 19:55:30" itemprop="dateCreated datePublished" datetime="2018-03-07T19:55:30-08:00">2018-03-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2019-05-03 21:33:06" itemprop="dateModified" datetime="2019-05-03T21:33:06-07:00">2019-05-03</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/C-C/" itemprop="url" rel="index"><span itemprop="name">C-C++</span></a>
+        </span>
+    </span>
+
+  
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="引用（Reference）"><a href="#引用（Reference）" class="headerlink" title="引用（Reference）"></a>引用（Reference）</h1><blockquote>
+<p>A reference defines an alternative name for an object</p>
+</blockquote>
+<p>引用实际上并不是一个对象，它只是给已有的变量赋予了另外一个名字。当我们初始化一个变量时，我们会将initializer的值复制给这个我们正在创造的对象。而当我们初始化一个引用的时候，我们是将其initializer的引用和我们正在生成的引用绑定在一起。一旦引用被初始化，它就被限制在这个初始对象上，不能再将其与另外对象的引用重新绑定。所以，引用是必须被初始化的，而不能只是简单的“声明”。</p>
+<a id="more"></a>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> iVal = <span class="number">1024</span>;         <span class="comment">// define an int object named by iVal</span></span><br><span class="line"><span class="keyword">int</span> &amp;refVal = iVal;      <span class="comment">// define a reference bound with reference of iVal</span></span><br><span class="line"></span><br><span class="line">refVal = <span class="number">2</span>;              <span class="comment">// assigns 2 to the object that refVal refVal refers to</span></span><br><span class="line"><span class="keyword">int</span> ii = refVal;         <span class="comment">// the same as ii = iVal</span></span><br></pre></td></tr></table></figure>
+
+<p>只有对象才有引用，而引用本身并不是一个对象，所以我们不能定义一个引用的引用。另外当我们用右值（比如一个具体数字）对引用进行初始化时，会出现错误。而当在命令之前加上<code>const</code>之后，就是可以通过编译了。但具体为什么，和这个命令的实际意义，在后面的学习再做探讨。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> &amp;a = <span class="number">10</span>;           <span class="comment">// illegal, error occurs</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;b = <span class="number">11</span>;     <span class="comment">// legal, BUT, what&#x27;s the meaning???</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="指针（Pointer）"><a href="#指针（Pointer）" class="headerlink" title="指针（Pointer）"></a>指针（Pointer）</h1><p>指针也是一种<code>compound type</code>， 它和引用一样也用于间接使用其他对象。但和引用不同的是指针是一个对象，它可以被赋值、赋值；且一个至真可以在lifetime结束之前可以指向多个不同的对象。指针在定义是不一定要初始化，在需要它指向一些对象时使用即可。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> ival = <span class="number">12</span>;</span><br><span class="line"><span class="keyword">int</span> *p = &amp;ival;      <span class="comment">// p holds the address of ival; p is a pointer to ival</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>p</code> 定义为指向 <code>ival</code> 的指针后，<code>p</code> 实际上存储的是<code>ival</code> 的地址。当我们试图输出<code>p</code> 时，我们会看到一串16进制数，那就是 <code>ival</code> 的地址。只有在输出 <code>*p</code> 时我们才会看到 <code>ival</code> 在对应内存为之中所存储的数值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> dval;</span><br><span class="line"><span class="keyword">double</span> *pd = dval;   <span class="comment">// illegal: initializer is an int object rather than address</span></span><br><span class="line"><span class="keyword">double</span> *pd = &amp;dval;  <span class="comment">// valid: initializer is the address of a double</span></span><br><span class="line"><span class="keyword">double</span> *pd2 = pd;    <span class="comment">// valis: initializer is a pointer as well</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>指针的值</strong>：</p>
+<p>存储在指针中的值可以是一下四种情况中的一种</p>
+<ol>
+<li>指向一个对象</li>
+<li>指向刚好过一个对象结尾处的位置 （WTF？？？）</li>
+<li>可以是一个空指针 <code>null pointer</code></li>
+<li>也可以是invalid，不是上述三类中的</li>
+</ol>
+<p>第二类我实在是有点懵逼啊…</p>
+<h1 id="两个运算符：-amp-and"><a href="#两个运算符：-amp-and" class="headerlink" title="两个运算符：&amp; and *"></a>两个运算符：<code>&amp;</code> and <code>*</code></h1><blockquote>
+<p><code>&amp;</code>:  <strong>address-of operator</strong>. Yields the address of the object which it is applied.</p>
+<p><code>*</code>: <strong>Dereference operator</strong>. Dereference a pointer returns the object to which the pointer points. Assigning to the result of dereference assigns a new value to the underlying object.</p>
+</blockquote>
+<p><code>&amp;</code> 除了有bitwise AND这样的逻辑运算意义之外，一个重要的作用就是获取变量的地址。它可以用在各种不同类请的变量上，只要变量是一个已经定义的对象。指针也是一个对象，也有地址。因此 <code>&amp;</code> 也可以用在指针变量上。而 <code>&amp;</code> 却只能应用于指针上。指针存储的是一个地址，而其他类型的变量对应的内存位置存储的是一个数值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">100</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;A = a;</span><br><span class="line"><span class="keyword">int</span> *ptrA = &amp;A, *ptra = &amp;a;</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Address of a: &quot;</span> &lt;&lt; &amp;a &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Address of A: &quot;</span> &lt;&lt; &amp;A &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span> &lt;&lt; <span class="string">&quot;Pointer ptrA&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Address of ptrA: &quot;</span> &lt;&lt; &amp;ptrA &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Stored value of ptrA: &quot;</span> &lt;&lt; ptrA &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;The value of object pointed by ptrA: &quot;</span> &lt;&lt; *ptrA &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span> &lt;&lt; <span class="string">&quot;Pointer ptra&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Address of ptra: &quot;</span> &lt;&lt; &amp;ptra &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Stored value of ptra: &quot;</span> &lt;&lt; ptra &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;The value of object pointed by ptra: &quot;</span> &lt;&lt; *ptra &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure>
+
+<p>下面是上面代码片段的输出。<code>ptrA</code> 和 <code>ptra</code> 作为两个指针有着自己不同的内存地址，在这两个内存位置又分别存储了 <code>A</code> 和 <code>a</code> 的地址。而作为同一对象的两个引用，<code>A</code> 和 <code>a</code> 有着同样的内存地址。所以两个指针实际上是指向的是同一个对象，存储完全相同的内存地址，<code>*</code> 运算符dereference之后得到的值也就是一样的了。</p>
+<p><img src="http://post-pic.nos-eastchina1.126.net/LeetCode/%E6%8D%95%E8%8E%B7.PNG" alt="console"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Pointer/" rel="tag"><i class="fa fa-tag"></i> Pointer</a>
+              <a href="/tags/Reference/" rel="tag"><i class="fa fa-tag"></i> Reference</a>
+              <a href="/tags/C-Prime/" rel="tag"><i class="fa fa-tag"></i> C++Prime</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/%E6%84%9F%E7%9F%A5%E6%9C%BA/" rel="prev" title="机器学习模型——感知机">
+                  <i class="fa fa-chevron-left"></i> 机器学习模型——感知机
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/cpp-vector/" rel="next" title="C++ vector">
+                  C++ vector <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-bolt"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href="https://magi003769.github.io/"><b>Jeff Wong</b></a></span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
 </body>
 </html>

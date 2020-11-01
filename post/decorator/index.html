@@ -1,21 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Python中的装饰器与类中的property - QueinDecim</title>
-<base href="/">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-<link rel="canonical" href="https://magi003769.github.io/post/decorator/">
-<link rel="icon" type="image/x-icon" href="/avatar/256x256bb.jpg">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
 
-<meta name="description" content="原来读 python 代码的时候，经常遇到 @ 这个符号却并不知道是个啥意思。它经常出现在某一个类的函数定义前。这就是 python 的一个语法糖 —— 装饰器（Decorator）。考虑到模块化的设计，装饰器帮助我们在不改变函数定义的情况下，增加需要的功能，比如输出日志，性能测试，事务处理、缓存、权限校验等。">
-<meta property="og:type" content="website">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-doge.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-doge.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"magi003769.github.io","root":"/","scheme":"Gemini","version":"8.0.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"sidebar":"fadeIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}};
+  </script>
+
+  <meta name="description" content="原来读 python 代码的时候，经常遇到 @ 这个符号却并不知道是个啥意思。它经常出现在某一个类的函数定义前。这就是 python 的一个语法糖 —— 装饰器（Decorator）。考虑到模块化的设计，装饰器帮助我们在不改变函数定义的情况下，增加需要的功能，比如输出日志，性能测试，事务处理、缓存、权限校验等。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Python中的装饰器与类中的property">
 <meta property="og:url" content="https://magi003769.github.io/post/decorator/index.html">
 <meta property="og:site_name" content="QueinDecim">
 <meta property="og:description" content="原来读 python 代码的时候，经常遇到 @ 这个符号却并不知道是个啥意思。它经常出现在某一个类的函数定义前。这就是 python 的一个语法糖 —— 装饰器（Decorator）。考虑到模块化的设计，装饰器帮助我们在不改变函数定义的情况下，增加需要的功能，比如输出日志，性能测试，事务处理、缓存、权限校验等。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://post-pic.nos-eastchina1.126.net/header_imgs/post-bg.jpg">
 <meta property="article:published_time" content="2018-06-30T07:00:00.000Z">
 <meta property="article:modified_time" content="2019-05-07T06:10:06.000Z">
 <meta property="article:author" content="Jeff Wong">
@@ -24,23 +40,444 @@
 <meta property="article:tag" content="面试">
 <meta property="article:tag" content="Decorator">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://post-pic.nos-eastchina1.126.net/header_imgs/post-bg.jpg">
 
 
-<link href="//fonts.googleapis.com/css?family=Baloo+Bhaijaan|Inconsolata|Josefin+Sans|Montserrat" rel="stylesheet">
-<link href="/styles.e4c22be5bb2c26eab146.css" rel="stylesheet">
-
-<link rel="stylesheet" href="/theme.2ebab4f24f0c1824c162.css" is="theme">
+<link rel="canonical" href="https://magi003769.github.io/post/decorator/">
 
 
-<script src="/config.c12e8ee59e0053a6e51b.js"></script>
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Python中的装饰器与类中的property | QueinDecim</title>
+  
 
 
-<meta name="generator" content="Hexo 4.2.0"></head>
-<body lang="en">
-<is-a></is-a>
-<script src="/runtime.1720a40670866f12654e.js"></script>
-<script src="/polyfills.69a7b8a907a7ac9da988.js"></script>
-<script src="/main.12c3a04fa47641f902c2.js"></script>
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">QueinDecim</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">God in his heaven all's right with the world</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA-Python-%E5%86%85%E7%BD%AE%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8%EF%BC%9A-property"><span class="nav-number">1.</span> <span class="nav-text">一个 Python 内置的装饰器：@property</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeff Wong"
+      src="/images/spike_smoke.jpg">
+  <p class="site-author-name" itemprop="name">Jeff Wong</p>
+  <div class="site-description" itemprop="description">本当の声は いつだって 正しい道を照らしてる</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">74</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MAGI003769" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MAGI003769" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/ruihao.wang.777" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;ruihao.wang.777" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.instagram.com/jeffwooong/" title="Instagram → https:&#x2F;www.instagram.com&#x2F;jeffwooong&#x2F;" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/p/1005052622574043/home?from=page_100505&mod=TAB#place" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052622574043&#x2F;home?from&#x3D;page_100505&amp;mod&#x3D;TAB#place" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://magi003769.github.io/post/decorator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/spike_smoke.jpg">
+      <meta itemprop="name" content="Jeff Wong">
+      <meta itemprop="description" content="本当の声は いつだって 正しい道を照らしてる">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="QueinDecim">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python中的装饰器与类中的property
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-06-30 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-30T00:00:00-07:00">2018-06-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2019-05-06 23:10:06" itemprop="dateModified" datetime="2019-05-06T23:10:06-07:00">2019-05-06</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+        </span>
+    </span>
+
+  
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原来读 python 代码的时候，经常遇到 <code>@</code> 这个符号却并不知道是个啥意思。它经常出现在某一个类的函数定义前。这就是 python 的一个语法糖 —— 装饰器（Decorator）。考虑到模块化的设计，<strong>装饰器帮助我们在不改变函数定义的情况下，增加需要的功能</strong>，比如输出日志，性能测试，事务处理、缓存、权限校验等。</p>
+<a id="more"></a>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> functools</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log</span>(<span class="params">func</span>):</span></span><br><span class="line"><span class="meta">	@functools.wraps(func)</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*arg, **kwargs</span>):</span></span><br><span class="line">		print(<span class="string">&#x27;\ncall %s()&#x27;</span> % func.__name__)</span><br><span class="line">		<span class="keyword">return</span> func(*arg, **kwargs)</span><br><span class="line">	<span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"><span class="meta">@log</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">slogan</span>():</span></span><br><span class="line">	print(<span class="string">&#x27;Don\&#x27;t stop learning&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>装饰器本质上是能够返回一个函数的高阶函数。上面是一个装饰器的实现，是一个二层嵌套结构，基本的功能是在调用函数的时候产生日志。在定义函数 <code>slogan()</code> 时，相当于执行了语句 <code>slogan=log(slogan)</code>。<strong><code>log()</code>  是一个装饰器，返回一个函数，所以最原始的函数 <code>slogan()</code> 依然存在，而现在同名的 <code>slogan</code> 变量则指向一个经过 <code>log()</code> 处理的新函数。</strong> 所以在主程序中调用 <code>slogan()</code> 将会执行新的函数，即 <code>log()</code> 中返回的 <code>wrapper()</code> 函数。</p>
+<p>如果我们需要给装饰器本身传入参数，在定义时就需要在 <code>wrapper()</code> 外在封装一层，原先的最外层就用来区别装饰器的名称和传参。这样，需要传参的装饰器就是一个三层嵌套结构。定义函数时相当于执行了 <code>slogan = log2(&#39;execute&#39;)(slogan)</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log2</span>(<span class="params">text</span>):</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">func</span>):</span></span><br><span class="line"><span class="meta">		@functools.wraps(func)</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*arg, **kwargs</span>):</span></span><br><span class="line">			print(<span class="string">&#x27;\n%s %s()&#x27;</span> % (text, func.__name__))</span><br><span class="line">			<span class="keyword">return</span> func(*arg, **kwargs)</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">	<span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line"><span class="meta">@log2(&#x27;execute&#x27;)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">slogan</span>():</span></span><br><span class="line">	print(<span class="string">&#x27;Don\&#x27;t stop learning&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>上面的两个装饰器有一个值得注意的地方：<code>@functools.wraps(func)</code>。它是为了解决关于函数名统一的问题。在 python 中，函数作为对象，也有一个属性 <code>__name__</code>。上面我们也讨论了，装饰器是返回了一个函数，那么他最终返回的就是嵌套在最内层的 <code>wrapper()</code>。因此，在没有 <code>@functools.wraps(func)</code> 这个指令的情况下，我们获取函数名时 <code>slogan.__name__</code> 会输出 <code>&#39;wrapper&#39;</code>，而不是 <code>&#39;slogan&#39;</code>。<code>@functools.wraps(func)</code> 相当于在装饰器内执行 <code>wrapper.__name__=func.__name__</code>。<strong>这一命令是使用在 wrapper函数之前的。</strong></p>
+<p><strong>小练习：如何定义一个在调用函数前后都输出日志的装饰器？</strong></p>
+<p>只要在最内层的 <code>wrapper()</code> 中调用被修饰的函数，将其赋值给一个变量。这样就在调用的同时又可以返回该函数。只要在调用前后进行日志输出即可。单纯地将调用后的日志输出设定在wrapper外，decorator之内是不行的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;Exercise&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Following funciton is WRONG</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log3</span>(<span class="params">text=<span class="string">&#x27;&#x27;</span></span>):</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">func</span>):</span></span><br><span class="line"><span class="meta">		@functools.wraps(func)</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*arg, **kwargs</span>):</span></span><br><span class="line">			print(<span class="string">&#x27;\nBegin call: %s%s&#x27;</span> % (text, func.__name__))</span><br><span class="line">			<span class="keyword">return</span> call</span><br><span class="line">         print(<span class="string">&#x27;End call: %s%s&#x27;</span> % (text, func.__name__))</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">	<span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line"><span class="comment"># Following funciton is RIGHT</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log3</span>(<span class="params">text=<span class="string">&#x27;&#x27;</span></span>):</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">func</span>):</span></span><br><span class="line"><span class="meta">		@functools.wraps(func)</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*arg, **kwargs</span>):</span></span><br><span class="line">			print(<span class="string">&#x27;\nBegin call: %s%s&#x27;</span> % (text, func.__name__))</span><br><span class="line">			call = func(*arg, **kwargs)</span><br><span class="line">			print(<span class="string">&#x27;End call: %s%s&#x27;</span> % (text, func.__name__))</span><br><span class="line">			<span class="keyword">return</span> call</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">	<span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="一个-Python-内置的装饰器：-property"><a href="#一个-Python-内置的装饰器：-property" class="headerlink" title="一个 Python 内置的装饰器：@property"></a>一个 Python 内置的装饰器：<code>@property</code></h1><p>这里介绍一个修饰器在 Python 的一个应用：<code>@property</code>。它非常广泛的应用在 OOP 中。通常情况下定义一个类，我们需要如下的设计：<code>get_score()</code>来获取成绩，<code>set_score()</code> 来设定、修改成绩，这样就可以在设置时检查成绩是否合法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_score</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self._score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_score</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">isinstance</span>(value, <span class="built_in">int</span>):</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">&#x27;score must be an integer!&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> value &lt; <span class="number">0</span> <span class="keyword">or</span> value &gt; <span class="number">100</span>:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">&#x27;score must between 0 ~ 100!&#x27;</span>)</span><br><span class="line">        self._score = value</span><br></pre></td></tr></table></figure>
+
+<p>但是为了程序的简单易用性，我们想要使用类似于属性的简单方式来访问类的变量，同时又可以对参数的合法性进行检查。于是 Python 就为我们提供了一个内置的装饰器 <code>@property</code> 来达到这个目的。将一个同名的函数定义时加上 <code>@property</code> 就可以了。与此同时，它有自动生成了另一个装饰器 <code>@score.setter</code>，用来把一个 setter 变成属性变量，于是就产生了一个可以设置检查条件的简单方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line"><span class="meta">	@property</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">score</span>(<span class="params">self</span>):</span></span><br><span class="line">		<span class="keyword">return</span> self.__score</span><br><span class="line"></span><br><span class="line"><span class="meta">	@score.setter</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">score</span>(<span class="params">self, value</span>):</span></span><br><span class="line">		<span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">isinstance</span>(value, <span class="built_in">int</span>):</span><br><span class="line">			<span class="keyword">raise</span> ValueError(<span class="string">&#x27;score must be integer!&#x27;</span>)</span><br><span class="line">		<span class="keyword">if</span> value &lt; <span class="number">0</span> <span class="keyword">or</span> value &gt; <span class="number">100</span>:</span><br><span class="line">			<span class="keyword">raise</span> ValueError(<span class="string">&#x27;score must between 0 ~ 100&#x27;</span>)</span><br><span class="line">		self.__score = value</span><br></pre></td></tr></table></figure>
+
+<p>一点想法：关于私有变量。C++ 中的私有变量是不能直接访问的，需要通过特定的方法方法才能访问。上面这样的设计就意味着设计了一个访问方法。那么 python 中又是如何保证私有变量不被外部非友元访问的呢？</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001386819879946007bbf6ad052463ab18034f0254bf355000">廖雪峰 - 装饰器</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001386820062641f3bcc60a4b164f8d91df476445697b9e000">廖雪峰 - @property 使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.programiz.com/python-programming/property">python programming - property</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+              <a href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="tag"><i class="fa fa-tag"></i> 基本概念</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"><i class="fa fa-tag"></i> 面试</a>
+              <a href="/tags/Decorator/" rel="tag"><i class="fa fa-tag"></i> Decorator</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/%E9%80%BB%E8%BE%91%E6%96%AF%E8%B0%9B/" rel="prev" title="机器学习模型——逻辑斯谛回归">
+                  <i class="fa fa-chevron-left"></i> 机器学习模型——逻辑斯谛回归
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/" rel="next" title="机器学习模型——朴素贝叶斯法">
+                  机器学习模型——朴素贝叶斯法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-bolt"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href="https://magi003769.github.io/"><b>Jeff Wong</b></a></span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
 </body>
 </html>

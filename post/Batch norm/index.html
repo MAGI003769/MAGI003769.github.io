@@ -1,44 +1,696 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Batch Normalization：定义与实现 - QueinDecim</title>
-<base href="/">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-<link rel="canonical" href="https://magi003769.github.io/post/Batch%20norm/">
-<link rel="icon" type="image/x-icon" href="/avatar/256x256bb.jpg">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
 
-<meta name="description" content="现在BN基本上是深度学习或者说CNN的标配，他可以帮助提升训练速度，提升模型的效果。强烈推荐这两篇专栏文章：Batch Normalization原理与实战、详解深度学习中的Normalization，BN&#x2F;LN&#x2F;WN。本篇也基本就是这两篇的搬运和拼凑。">
-<meta property="og:type" content="website">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-doge.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-doge.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"magi003769.github.io","root":"/","scheme":"Gemini","version":"8.0.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"sidebar":"fadeIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}};
+  </script>
+
+  <meta name="description" content="现在BN基本上是深度学习或者说CNN的标配，他可以帮助提升训练速度，提升模型的效果。强烈推荐这两篇专栏文章：Batch Normalization原理与实战、详解深度学习中的Normalization，BN&#x2F;LN&#x2F;WN。本篇也基本就是这两篇的搬运和拼凑。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Batch Normalization：定义与实现">
 <meta property="og:url" content="https://magi003769.github.io/post/Batch%20norm/index.html">
 <meta property="og:site_name" content="QueinDecim">
 <meta property="og:description" content="现在BN基本上是深度学习或者说CNN的标配，他可以帮助提升训练速度，提升模型的效果。强烈推荐这两篇专栏文章：Batch Normalization原理与实战、详解深度学习中的Normalization，BN&#x2F;LN&#x2F;WN。本篇也基本就是这两篇的搬运和拼凑。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://post-pic.nos-eastchina1.126.net/Deep-Learning/HD_BN.png">
+<meta property="og:image" content="https://post-pic.nos-eastchina1.126.net/Deep-Learning/saturated_activation.png">
+<meta property="og:image" content="https://post-pic.nos-eastchina1.126.net/Deep-Learning/BN_algorithm.jpg">
+<meta property="og:image" content="https://post-pic.nos-eastchina1.126.net/Deep-Learning/moving_mean_var.PNG">
 <meta property="article:published_time" content="2018-10-01T07:00:00.000Z">
 <meta property="article:modified_time" content="2020-05-10T23:04:40.000Z">
 <meta property="article:author" content="Jeff Wong">
 <meta property="article:tag" content="Deep Learning">
 <meta property="article:tag" content="Batch Normalization">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://post-pic.nos-eastchina1.126.net/Deep-Learning/HD_BN.png">
+<meta name="twitter:image" content="https://post-pic.nos-eastchina1.126.net/Deep-Learning/saturated_activation.png">
 
 
-<link href="//fonts.googleapis.com/css?family=Baloo+Bhaijaan|Inconsolata|Josefin+Sans|Montserrat" rel="stylesheet">
-<link href="/styles.e4c22be5bb2c26eab146.css" rel="stylesheet">
-
-<link rel="stylesheet" href="/theme.2ebab4f24f0c1824c162.css" is="theme">
+<link rel="canonical" href="https://magi003769.github.io/post/Batch%20norm/">
 
 
-<script src="/config.c12e8ee59e0053a6e51b.js"></script>
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Batch Normalization：定义与实现 | QueinDecim</title>
+  
 
 
-<meta name="generator" content="Hexo 4.2.0"></head>
-<body lang="en">
-<is-a></is-a>
-<script src="/runtime.1720a40670866f12654e.js"></script>
-<script src="/polyfills.69a7b8a907a7ac9da988.js"></script>
-<script src="/main.12c3a04fa47641f902c2.js"></script>
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">QueinDecim</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">God in his heaven all's right with the world</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background-and-Why-BN"><span class="nav-number">1.</span> <span class="nav-text">Background and Why BN?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%9B%B0%E6%89%B0%E4%B8%8EInternal-Covariant-Shift"><span class="nav-number">1.1.</span> <span class="nav-text">深度学习的困扰与Internal Covariant Shift</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Internal-Covariant-Shift%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.</span> <span class="nav-text">Internal Covariant Shift带来的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Batch-Normalization"><span class="nav-number">2.</span> <span class="nav-text">Batch Normalization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BN%E5%AE%9A%E4%B9%89%E4%B8%8E%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.1.</span> <span class="nav-text">BN定义与算法步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E6%B5%8B%E9%98%B6%E6%AE%B5%E7%9A%84BN"><span class="nav-number">2.2.</span> <span class="nav-text">推测阶段的BN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BN%E7%9A%84%E4%BC%98%E5%8A%BF%E5%9C%A8%E5%93%AA%E9%87%8C"><span class="nav-number">2.3.</span> <span class="nav-text">BN的优势在哪里</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TensorFlow-%E4%B8%AD-BN-%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.</span> <span class="nav-text">TensorFlow 中 BN 的接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tf-nn-batch-normalization"><span class="nav-number">3.1.</span> <span class="nav-text">tf.nn.batch_normalization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tf-layers-batch-normalization"><span class="nav-number">3.2.</span> <span class="nav-text">tf.layers.batch_normalization</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Summary"><span class="nav-number">4.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeff Wong"
+      src="/images/spike_smoke.jpg">
+  <p class="site-author-name" itemprop="name">Jeff Wong</p>
+  <div class="site-description" itemprop="description">本当の声は いつだって 正しい道を照らしてる</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">74</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MAGI003769" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MAGI003769" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/ruihao.wang.777" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;ruihao.wang.777" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.instagram.com/jeffwooong/" title="Instagram → https:&#x2F;www.instagram.com&#x2F;jeffwooong&#x2F;" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/p/1005052622574043/home?from=page_100505&mod=TAB#place" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052622574043&#x2F;home?from&#x3D;page_100505&amp;mod&#x3D;TAB#place" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://magi003769.github.io/post/Batch%20norm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/spike_smoke.jpg">
+      <meta itemprop="name" content="Jeff Wong">
+      <meta itemprop="description" content="本当の声は いつだって 正しい道を照らしてる">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="QueinDecim">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Batch Normalization：定义与实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2018-10-01T00:00:00-07:00">2018-10-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2020-05-10 16:04:40" itemprop="dateModified" datetime="2020-05-10T16:04:40-07:00">2020-05-10</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+        </span>
+    </span>
+
+  
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>现在BN基本上是深度学习或者说CNN的标配，他可以帮助提升训练速度，提升模型的效果。强烈推荐这两篇专栏文章：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/34879333">Batch Normalization原理与实战</a>、<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33173246">详解深度学习中的Normalization，BN/LN/WN</a>。本篇也基本就是这两篇的搬运和拼凑。</p>
+<a id="more"></a>
+
+<h1 id="Background-and-Why-BN"><a href="#Background-and-Why-BN" class="headerlink" title="Background and Why BN?"></a>Background and Why BN?</h1><h2 id="深度学习的困扰与Internal-Covariant-Shift"><a href="#深度学习的困扰与Internal-Covariant-Shift" class="headerlink" title="深度学习的困扰与Internal Covariant Shift"></a>深度学习的困扰与Internal Covariant Shift</h2><p>我们知道随着Deep Learning的发展，网络变得越来越深、越来越复杂。这样输入信息或者浅层网络的输出稍有变动，就会随着后续网络的深入而被不断放大，深层的输入变化就会变得非常剧烈。因此，我们需要尝试不同的参数配置甚至精心设计每一层的参数初始化，才能达到理想的效果。然而这个过程是极为困难和复杂的，这也是深度网络难以训练的一个重要原因：<strong>层与层之间高度的关联和耦合性</strong>。深层网络的参数需要不断改变去适应浅层输入的变化，哪怕这些变化十分微小。BN的原作者把这个现象称作：<strong>Internal Covariant Shift</strong>，并起将其定义为：</p>
+<blockquote>
+<p>在深层网络训练的过程中，由于网络中参数变化而引起内部结点数据分布发生变化</p>
+</blockquote>
+<h2 id="Internal-Covariant-Shift带来的问题"><a href="#Internal-Covariant-Shift带来的问题" class="headerlink" title="Internal Covariant Shift带来的问题"></a>Internal Covariant Shift带来的问题</h2><blockquote>
+<ol>
+<li><p>深层的网络需要不断调整来适应输入数据分布的变化，这会导致网络学习速度的下降。</p>
+</li>
+<li><p>网络输入的变化被放大，深层的输入趋向于更小或更大，这样输入极易进入饱和区</p>
+</li>
+</ol>
+</blockquote>
+<p>第一条问题我们已经在之前讨论了，第二条主要讲的是一个梯度消失的问题。当的那个神经网络采用saturated activation function的时候，例如sigmoid和tanh，趋向极端的输入变化会使得模型训练进入饱和区。这些区域的梯度为0，反向传播无法更新参数，整个模型的学习也就陷入停滞。</p>
+<p><img src="https://post-pic.nos-eastchina1.126.net/Deep-Learning/saturated_activation.png" alt="BN_staturate_act"></p>
+<p>对于激活函数的梯度饱和问题，其实有两种思路：(1) 使用非饱和的激活函数，比如人见人爱花见花开的ReLU，他可以一定程度上解决进入饱和区问题。(2) 另一种就是尽可能使输入落在不饱和的区域。如上图所示，BN就属于这种思路的一个解决方案。</p>
+<h1 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h1><h2 id="BN定义与算法步骤"><a href="#BN定义与算法步骤" class="headerlink" title="BN定义与算法步骤"></a>BN定义与算法步骤</h2><p>要使得数据都落在指定范围内或者尽可能符合某个指定的分布，比较常见的思路是使用白化（whitening）。它将数据投射到一个标准正态上，均值为0方差为1。白化的基本公式如下所示，非常基础</p>
+<p style="text-align:center"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="12.435ex" height="5.176ex" style="vertical-align: -1.838ex;" viewBox="0 -1437.2 5354.1 2228.5" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\hat{x_i} = \frac{x_i - \mu}{\sigma}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-69" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-5E" d="M112 560L249 694L257 686Q387 562 387 560L361 531Q359 532 303 581L250 627L195 580Q182 569 169 557T148 538L140 532Q138 530 125 546L112 560Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-3BC" d="M58 -216Q44 -216 34 -208T23 -186Q23 -176 96 116T173 414Q186 442 219 442Q231 441 239 435T249 423T251 413Q251 401 220 279T187 142Q185 131 185 107V99Q185 26 252 26Q261 26 270 27T287 31T302 38T315 45T327 55T338 65T348 77T356 88T365 100L372 110L408 253Q444 395 448 404Q461 431 491 431Q504 431 512 424T523 412T525 402L449 84Q448 79 448 68Q448 43 455 35T476 26Q485 27 496 35Q517 55 537 131Q543 151 547 152Q549 153 557 153H561Q580 153 580 144Q580 138 575 117T555 63T523 13Q510 0 491 -8Q483 -10 467 -10Q446 -10 429 -4T402 11T385 29T376 44T374 51L368 45Q362 39 350 30T324 12T288 -4T246 -11Q199 -11 153 12L129 -85Q108 -167 104 -180T92 -202Q76 -216 58 -216Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-3C3" d="M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-78" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-69" x="809" y="-213"></use>
+ <use xlink:href="#E1-MJMAIN-5E" x="208" y="20"></use>
+ <use xlink:href="#E1-MJMAIN-3D" x="1194" y="0"></use>
+<g transform="translate(1973,0)">
+<g transform="translate(397,0)">
+<rect stroke="none" width="2863" height="60" x="0" y="220"></rect>
+<g transform="translate(60,736)">
+ <use xlink:href="#E1-MJMATHI-78" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-69" x="809" y="-213"></use>
+ <use xlink:href="#E1-MJMAIN-2212" x="1139" y="0"></use>
+ <use xlink:href="#E1-MJMATHI-3BC" x="2139" y="0"></use>
+</g>
+ <use xlink:href="#E1-MJMATHI-3C3" x="1145" y="-686"></use>
+</g>
+</g>
+</g>
+</svg></p>
+<p>其目的主要有两个：<strong>(1) 使得输入的特征符合统一分布（同均值方差），(2) 去除特征之间的相关性</strong>。理论上来说，这里实际上已经可以解决之前说的Internal Covariant Shift的问题了，但实际上它也存在两个问题：<strong>(1) 计算成本相当高，(2) 当输入被映射到标准正态上之后，其表征能力被很大程度的削弱了</strong>。后者显然是一个更加棘手的问题，也是BN和白化的最大的区别。</p>
+<p>下面是BN的伪代码，可以看到我们先做了简单的白化操作得到<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.129ex" height="2.509ex" style="vertical-align: -0.671ex;" viewBox="0 -791.3 916.8 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\hat{x_i}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-69" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-5E" d="M112 560L249 694L257 686Q387 562 387 560L361 531Q359 532 303 581L250 627L195 580Q182 569 169 557T148 538L140 532Q138 530 125 546L112 560Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-78" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-69" x="809" y="-213"></use>
+ <use xlink:href="#E1-MJMAIN-5E" x="208" y="20"></use>
+</g>
+</svg>。<strong>为了恢复数据的表征能力</strong>，就索性在增加一个线性操作，引入<strong>参数<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.262ex" height="2.176ex" style="vertical-align: -0.838ex;" viewBox="0 -576.1 543.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\gamma</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3B3" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3B3" x="0" y="0"></use>
+</g>
+</svg> (re-scale factor)和<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.332ex" height="2.509ex" style="vertical-align: -0.671ex;" viewBox="0 -791.3 573.5 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\beta</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3B2" d="M29 -194Q23 -188 23 -186Q23 -183 102 134T186 465Q208 533 243 584T309 658Q365 705 429 705H431Q493 705 533 667T573 570Q573 465 469 396L482 383Q533 332 533 252Q533 139 448 65T257 -10Q227 -10 203 -2T165 17T143 40T131 59T126 65L62 -188Q60 -194 42 -194H29ZM353 431Q392 431 427 419L432 422Q436 426 439 429T449 439T461 453T472 471T484 495T493 524T501 560Q503 569 503 593Q503 611 502 616Q487 667 426 667Q384 667 347 643T286 582T247 514T224 455Q219 439 186 308T152 168Q151 163 151 147Q151 99 173 68Q204 26 260 26Q302 26 349 51T425 137Q441 171 449 214T457 279Q457 337 422 372Q380 358 347 358H337Q258 358 258 389Q258 396 261 403Q275 431 353 431Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3B2" x="0" y="0"></use>
+</g>
+</svg> (re-shift factor)</strong>，这两个参数都是可训练参数。</p>
+<p><img src="https://post-pic.nos-eastchina1.126.net/Deep-Learning/BN_algorithm.jpg" alt="BN_alg"></p>
+<h2 id="推测阶段的BN"><a href="#推测阶段的BN" class="headerlink" title="推测阶段的BN"></a>推测阶段的BN</h2><p>在之前一节我们已经讨论了BN的实际计算和作用，这些都是基于mini-batch来做的，每个batch里面都包含很多样本。这样我们<strong>根据当前batch</strong>计算出的均值和方差偏差是比较小的。然而在推测（inference）或者说测试阶段，我们的batch size很小甚至是1，此时再用同样方法计算出的结果一定是偏估计。那我们应该如何计算呢？</p>
+<p><img src="https://post-pic.nos-eastchina1.126.net/Deep-Learning/moving_mean_var.PNG" alt="moving_mean_var"></p>
+<p>原文提供的方法是在我们利用诸多mini-batch的过程中，我们保留每一组的均值和方差：<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.881ex" height="2.176ex" style="vertical-align: -0.838ex;" viewBox="0 -576.1 1240.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\mu_B</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3BC" d="M58 -216Q44 -216 34 -208T23 -186Q23 -176 96 116T173 414Q186 442 219 442Q231 441 239 435T249 423T251 413Q251 401 220 279T187 142Q185 131 185 107V99Q185 26 252 26Q261 26 270 27T287 31T302 38T315 45T327 55T338 65T348 77T356 88T365 100L372 110L408 253Q444 395 448 404Q461 431 491 431Q504 431 512 424T523 412T525 402L449 84Q448 79 448 68Q448 43 455 35T476 26Q485 27 496 35Q517 55 537 131Q543 151 547 152Q549 153 557 153H561Q580 153 580 144Q580 138 575 117T555 63T523 13Q510 0 491 -8Q483 -10 467 -10Q446 -10 429 -4T402 11T385 29T376 44T374 51L368 45Q362 39 350 30T324 12T288 -4T246 -11Q199 -11 153 12L129 -85Q108 -167 104 -180T92 -202Q76 -216 58 -216Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-42" d="M231 637Q204 637 199 638T194 649Q194 676 205 682Q206 683 335 683Q594 683 608 681Q671 671 713 636T756 544Q756 480 698 429T565 360L555 357Q619 348 660 311T702 219Q702 146 630 78T453 1Q446 0 242 0Q42 0 39 2Q35 5 35 10Q35 17 37 24Q42 43 47 45Q51 46 62 46H68Q95 46 128 49Q142 52 147 61Q150 65 219 339T288 628Q288 635 231 637ZM649 544Q649 574 634 600T585 634Q578 636 493 637Q473 637 451 637T416 636H403Q388 635 384 626Q382 622 352 506Q352 503 351 500L320 374H401Q482 374 494 376Q554 386 601 434T649 544ZM595 229Q595 273 572 302T512 336Q506 337 429 337Q311 337 310 336Q310 334 293 263T258 122L240 52Q240 48 252 48T333 46Q422 46 429 47Q491 54 543 105T595 229Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3BC" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-42" x="853" y="-213"></use>
+</g>
+</svg> 和 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.807ex" height="3.176ex" style="vertical-align: -1.005ex;" viewBox="0 -934.9 1208.5 1367.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\sigma^2_B</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3C3" d="M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-42" d="M231 637Q204 637 199 638T194 649Q194 676 205 682Q206 683 335 683Q594 683 608 681Q671 671 713 636T756 544Q756 480 698 429T565 360L555 357Q619 348 660 311T702 219Q702 146 630 78T453 1Q446 0 242 0Q42 0 39 2Q35 5 35 10Q35 17 37 24Q42 43 47 45Q51 46 62 46H68Q95 46 128 49Q142 52 147 61Q150 65 219 339T288 628Q288 635 231 637ZM649 544Q649 574 634 600T585 634Q578 636 493 637Q473 637 451 637T416 636H403Q388 635 384 626Q382 622 352 506Q352 503 351 500L320 374H401Q482 374 494 376Q554 386 601 434T649 544ZM595 229Q595 273 572 302T512 336Q506 337 429 337Q311 337 310 336Q310 334 293 263T258 122L240 52Q240 48 252 48T333 46Q422 46 429 47Q491 54 543 105T595 229Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3C3" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="810" y="488"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-42" x="808" y="-452"></use>
+</g>
+</svg>，并对他们取期望来作为测试阶段所使用的均值 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="4.359ex" height="2.176ex" style="vertical-align: -0.838ex;" viewBox="0 -576.1 1876.6 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\mu_{test}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3BC" d="M58 -216Q44 -216 34 -208T23 -186Q23 -176 96 116T173 414Q186 442 219 442Q231 441 239 435T249 423T251 413Q251 401 220 279T187 142Q185 131 185 107V99Q185 26 252 26Q261 26 270 27T287 31T302 38T315 45T327 55T338 65T348 77T356 88T365 100L372 110L408 253Q444 395 448 404Q461 431 491 431Q504 431 512 424T523 412T525 402L449 84Q448 79 448 68Q448 43 455 35T476 26Q485 27 496 35Q517 55 537 131Q543 151 547 152Q549 153 557 153H561Q580 153 580 144Q580 138 575 117T555 63T523 13Q510 0 491 -8Q483 -10 467 -10Q446 -10 429 -4T402 11T385 29T376 44T374 51L368 45Q362 39 350 30T324 12T288 -4T246 -11Q199 -11 153 12L129 -85Q108 -167 104 -180T92 -202Q76 -216 58 -216Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-65" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-73" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3BC" x="0" y="0"></use>
+<g transform="translate(603,-150)">
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-65" x="361" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-73" x="828" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="1297" y="0"></use>
+</g>
+</g>
+</svg> 和方差 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="4.284ex" height="3.176ex" style="vertical-align: -1.005ex;" viewBox="0 -934.9 1844.6 1367.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\sigma^2_{test}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3C3" d="M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-65" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-73" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3C3" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="810" y="488"></use>
+<g transform="translate(571,-279)">
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-65" x="361" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-73" x="828" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="1297" y="0"></use>
+</g>
+</g>
+</svg>，以实现无偏估计。这是一个非常关键的地方，会直接影响BN的效果。由此我们可以得出：<strong>BN在训练和测试阶段的操作差别很大</strong>。</p>
+<blockquote>
+<ol>
+<li>可训练参数 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.262ex" height="2.176ex" style="vertical-align: -0.838ex;" viewBox="0 -576.1 543.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\gamma</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3B3" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3B3" x="0" y="0"></use>
+</g>
+</svg> 和 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.332ex" height="2.509ex" style="vertical-align: -0.671ex;" viewBox="0 -791.3 573.5 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\beta</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3B2" d="M29 -194Q23 -188 23 -186Q23 -183 102 134T186 465Q208 533 243 584T309 658Q365 705 429 705H431Q493 705 533 667T573 570Q573 465 469 396L482 383Q533 332 533 252Q533 139 448 65T257 -10Q227 -10 203 -2T165 17T143 40T131 59T126 65L62 -188Q60 -194 42 -194H29ZM353 431Q392 431 427 419L432 422Q436 426 439 429T449 439T461 453T472 471T484 495T493 524T501 560Q503 569 503 593Q503 611 502 616Q487 667 426 667Q384 667 347 643T286 582T247 514T224 455Q219 439 186 308T152 168Q151 163 151 147Q151 99 173 68Q204 26 260 26Q302 26 349 51T425 137Q441 171 449 214T457 279Q457 337 422 372Q380 358 347 358H337Q258 358 258 389Q258 396 261 403Q275 431 353 431Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3B2" x="0" y="0"></use>
+</g>
+</svg> 在训练阶段会更新，测试阶段固定</li>
+<li>训练阶段会记录mini-batch的均值方差，从而得到样本整体的估计，并在过程中不断更新</li>
+</ol>
+</blockquote>
+<p>在具体的实现中，我们是利用Exponential Moving Average在训练中对<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="4.359ex" height="2.176ex" style="vertical-align: -0.838ex;" viewBox="0 -576.1 1876.6 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\mu_{test}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3BC" d="M58 -216Q44 -216 34 -208T23 -186Q23 -176 96 116T173 414Q186 442 219 442Q231 441 239 435T249 423T251 413Q251 401 220 279T187 142Q185 131 185 107V99Q185 26 252 26Q261 26 270 27T287 31T302 38T315 45T327 55T338 65T348 77T356 88T365 100L372 110L408 253Q444 395 448 404Q461 431 491 431Q504 431 512 424T523 412T525 402L449 84Q448 79 448 68Q448 43 455 35T476 26Q485 27 496 35Q517 55 537 131Q543 151 547 152Q549 153 557 153H561Q580 153 580 144Q580 138 575 117T555 63T523 13Q510 0 491 -8Q483 -10 467 -10Q446 -10 429 -4T402 11T385 29T376 44T374 51L368 45Q362 39 350 30T324 12T288 -4T246 -11Q199 -11 153 12L129 -85Q108 -167 104 -180T92 -202Q76 -216 58 -216Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-65" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-73" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3BC" x="0" y="0"></use>
+<g transform="translate(603,-150)">
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-65" x="361" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-73" x="828" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="1297" y="0"></use>
+</g>
+</g>
+</svg> 和方差 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="4.284ex" height="3.176ex" style="vertical-align: -1.005ex;" viewBox="0 -934.9 1844.6 1367.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">\sigma^2_{test}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-3C3" d="M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-65" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path>
+<path stroke-width="1" id="E1-MJMATHI-73" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-3C3" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="810" y="488"></use>
+<g transform="translate(571,-279)">
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-65" x="361" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-73" x="828" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-74" x="1297" y="0"></use>
+</g>
+</g>
+</svg>进行更新的方法。</p>
+<h2 id="BN的优势在哪里"><a href="#BN的优势在哪里" class="headerlink" title="BN的优势在哪里"></a>BN的优势在哪里</h2><p><strong>（1）BN是的网络为一层的分布相对稳定，加快模型学习速度</strong></p>
+<p>BN通过对输入进行标准化再进行线性操作增强表征，使得每层网络的输入数据的均值和方差在一定的范围内。这样一定程度上是对各个层之间的解耦，弱化层与层之间的联系，深层的网络不需要不断去适应浅层输入的变化，增加学习速度。</p>
+<p><strong>（2）弱化模型对参数的敏感程度，是学习过程更加稳定</strong></p>
+<p>之前提到随着网络的深入，微小的变化会逐渐被放大。如果我们使用一个scale factor <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.23ex" height="1.676ex" style="vertical-align: -0.338ex;" viewBox="0 -576.1 529.5 721.6" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">a</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-61" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-61" x="0" y="0"></use>
+</g>
+</svg> 来讨论输入的数值对后面的影响（推导过程见<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/34879333">链接</a>），会发现BN可以抹去权值缩放带来的影响。这样就抑制了浅层参数变化带来的后续巨大干扰，让训练过程更稳定。</p>
+<p><strong>（3）BN允许使用饱和激活函数：signoid、tanh</strong></p>
+<p>我觉得这一点其实也没什么了，现在ReLU基本已经变成了标配。之前也讨论过了，BN可以让输入的值尽量落在非饱和区，解决梯度消失的问题。</p>
+<p><strong>（4）BN具有一定的正则化效果</strong></p>
+<p>这一点是因为我们利用mini-batch去估计整个训练数据集的均值和方差。尽管每一个mini-batch都是随机抽样得到的，但每一次迭代都是有偏差估计，这也就是这个随机噪声的来源，类似于Dropout随即关闭神经元的正则化方式。虽然之前有人说BN和Dropout有其一即可，但是最近似乎有新的研究证明而这其实是可以共存的。</p>
+<h1 id="TensorFlow-中-BN-的接口"><a href="#TensorFlow-中-BN-的接口" class="headerlink" title="TensorFlow 中 BN 的接口"></a>TensorFlow 中 BN 的接口</h1><h2 id="tf-nn-batch-normalization"><a href="#tf-nn-batch-normalization" class="headerlink" title="tf.nn.batch_normalization"></a>tf.nn.batch_normalization</h2><p>这个接口的文档可以在后面的链接查到：<a target="_blank" rel="noopener" href="https://www.tensorflow.org/api_docs/python/tf/nn/batch_normalization"><code>tf.nn.batch_normalization</code></a>，是一个非常底层的接口。通过阅读它的源代码我们可以发现他实际上只进行了标准正态投影以及最后线性变化的计算，并不涉及均值方差的更新，如果单纯的使用这个接口，在测试时会出现问题。因此需要我们自己管理它们的更新。具体的代码如下（其实我也是从stackoverflow上面搬的）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">BN</span>(<span class="params">x, phase_train, name</span>):</span></span><br><span class="line">    x_shape = x.get_shape().as_list()</span><br><span class="line">    param_shape = x_shape[<span class="number">-1</span>:]</span><br><span class="line">    batch_mean, batch_var = tf.nn.moments(x, axes=[<span class="number">0</span> ,<span class="number">1</span>, <span class="number">2</span>])</span><br><span class="line">    beta = tf.get_variable(name+<span class="string">&#x27;/beta&#x27;</span>, param_shape, tf.float32,</span><br><span class="line">                            initializer=tf.constant_initializer(<span class="number">0.0</span>, tf.float32))</span><br><span class="line">    gamma = tf.get_variable(name+<span class="string">&#x27;/gamma&#x27;</span>, param_shape, tf.float32,</span><br><span class="line">                            initializer=tf.constant_initializer(<span class="number">1.0</span>, tf.float32))</span><br><span class="line">    ema = tf.train.ExponentialMovingAverage(decay=<span class="number">0.99</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mean_var_with_update</span>():</span></span><br><span class="line">        ema_apply_op = ema.apply([batch_mean, batch_var])</span><br><span class="line">        <span class="keyword">with</span> tf.control_dependencies([ema_apply_op]):</span><br><span class="line">            <span class="keyword">return</span> tf.identity(batch_mean), tf.identity(batch_var)</span><br><span class="line"></span><br><span class="line">    mean, var = tf.cond(phase_train,</span><br><span class="line">                        mean_var_with_update,</span><br><span class="line">                        <span class="keyword">lambda</span>: (ema.average(batch_mean), ema.average(batch_var)))</span><br><span class="line">    <span class="keyword">return</span> tf.nn.batch_normalization(x, mean, var, beta, gamma, BN_EPSILON)</span><br></pre></td></tr></table></figure>
+
+<h2 id="tf-layers-batch-normalization"><a href="#tf-layers-batch-normalization" class="headerlink" title="tf.layers.batch_normalization"></a>tf.layers.batch_normalization</h2><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/api_docs/python/tf/layers/batch_normalization"><code>tf.layers.batch_normalization</code></a>是一个相对高级的接口，除了算符部分要求的计算，在调用它的时候它也会自己管理用于test的均值和方差的更新。</p>
+<blockquote>
+<p><strong>Note:</strong> when training, the moving_mean and moving_variance need to be updated. By default the update ops are placed in <a target="_blank" rel="noopener" href="https://www.tensorflow.org/api_docs/python/tf/GraphKeys#UPDATE_OPS"><code>tf.GraphKeys.UPDATE_OPS</code></a>, so they need to be executed alongside the <code>train_op</code>. Also, be sure to add any batch_normalization ops before getting the update_ops collection. Otherwise, update_ops will be empty, and training/inference will not work properly. For example:</p>
+</blockquote>
+<p>接口本身会调用一些<code>UPDATE_OPS</code>，在训练的过程中我们需要把他们和优化loss的optimizer一起拎出来，只有这样才能对相应的值进行更新，和反向传导更新参数一个道理：不执行这个<code>op</code>就不更新。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">x_norm = tf.layers.batch_normalization(x, training=training)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)</span><br><span class="line">train_op = optimizer.minimize(loss)</span><br><span class="line">train_op = tf.group([train_op, update_ops])</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><p>总的来说，BN就是通过标准化保证输入的均值和方差在一定的范围内，减少网络的Internal Covariate Shift。让每一层的值在更加有效的范围内传递，降低网络对参数和激活函数等设置的依赖。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/48001759/what-is-right-batch-normalization-function-in-tensorflow">What is right batch normalization function in Tensorflow?</a></li>
+<li><a target="_blank" rel="noopener" href="https://kratzert.github.io/2016/02/12/understanding-the-gradient-flow-through-the-batch-normalization-layer.html">Understanding the backward pass through Batch Normalization Layer</a></li>
+<li><a target="_blank" rel="noopener" href="https://r2rt.com/implementing-batch-normalization-in-tensorflow.html">Implementing Batch Normalization in Tensorflow</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@SeoJaeDuk/deeper-understanding-of-batch-normalization-with-interactive-code-in-tensorflow-manual-back-1d50d6903d35">Deeper Understanding of Batch Normalization with Interactive Code in Tensorflow (Manual Back Propagation)</a></li>
+<li><a target="_blank" rel="noopener" href="https://towardsdatascience.com/pitfalls-of-batch-norm-in-tensorflow-and-sanity-checks-for-training-networks-e86c207548c8">Pitfalls of Batch Norm in TensorFlow and Sanity Checks for Training Networks</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/33949786/how-could-i-use-batch-normalization-in-tensorflow">How could I use batch normalization in TensorFlow?</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24810318">知乎 - 什么是批标准化</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/34879333">Batch Normalization原理与实战</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/38102762">知乎 - 深度学习中 Batch Normalization为什么效果好？</a></li>
+<li><a target="_blank" rel="noopener" href="https://timodenk.com/blog/tensorflow-batch-normalization/">Using TensorFlow’s Batch Normalization Correctly</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Deep-Learning/" rel="tag"><i class="fa fa-tag"></i> Deep Learning</a>
+              <a href="/tags/Batch-Normalization/" rel="tag"><i class="fa fa-tag"></i> Batch Normalization</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/DenseNet/" rel="prev" title="经典网络结构——DenseNet">
+                  <i class="fa fa-chevron-left"></i> 经典网络结构——DenseNet
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/Array_String/" rel="next" title="Array and String">
+                  Array and String <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-bolt"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href="https://magi003769.github.io/"><b>Jeff Wong</b></a></span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
 </body>
 </html>

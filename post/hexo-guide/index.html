@@ -1,21 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>A guide for Hexo and Github pages - QueinDecim</title>
-<base href="/">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-<link rel="canonical" href="https://magi003769.github.io/post/hexo-guide/">
-<link rel="icon" type="image/x-icon" href="/avatar/256x256bb.jpg">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
 
-<meta name="description" content="“Remember that the faith that moves mountains always carries a pick.” — Mark Twin  This is the first post written in this blog which mainly recorded the construction of environment to use hexo. Follo">
-<meta property="og:type" content="website">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-doge.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-doge.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"magi003769.github.io","root":"/","scheme":"Gemini","version":"8.0.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"sidebar":"fadeIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}};
+  </script>
+
+  <meta name="description" content="“Remember that the faith that moves mountains always carries a pick.” — Mark Twin  This is the first post written in this blog which mainly recorded the construction of environment to use hexo. Follo">
+<meta property="og:type" content="article">
 <meta property="og:title" content="A guide for Hexo and Github pages">
 <meta property="og:url" content="https://magi003769.github.io/post/hexo-guide/index.html">
 <meta property="og:site_name" content="QueinDecim">
 <meta property="og:description" content="“Remember that the faith that moves mountains always carries a pick.” — Mark Twin  This is the first post written in this blog which mainly recorded the construction of environment to use hexo. Follo">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://magi003769.github.io/avatar/smoke.jpg">
 <meta property="article:published_time" content="2017-07-10T05:32:35.000Z">
 <meta property="article:modified_time" content="2020-05-11T05:20:49.335Z">
 <meta property="article:author" content="Jeff Wong">
@@ -23,23 +39,465 @@
 <meta property="article:tag" content="Blog-Construction">
 <meta property="article:tag" content="mathjax">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://magi003769.github.io/avatar/smoke.jpg">
 
 
-<link href="//fonts.googleapis.com/css?family=Baloo+Bhaijaan|Inconsolata|Josefin+Sans|Montserrat" rel="stylesheet">
-<link href="/styles.e4c22be5bb2c26eab146.css" rel="stylesheet">
-
-<link rel="stylesheet" href="/theme.2ebab4f24f0c1824c162.css" is="theme">
+<link rel="canonical" href="https://magi003769.github.io/post/hexo-guide/">
 
 
-<script src="/config.c12e8ee59e0053a6e51b.js"></script>
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>A guide for Hexo and Github pages | QueinDecim</title>
+  
 
 
-<meta name="generator" content="Hexo 4.2.0"></head>
-<body lang="en">
-<is-a></is-a>
-<script src="/runtime.1720a40670866f12654e.js"></script>
-<script src="/polyfills.69a7b8a907a7ac9da988.js"></script>
-<script src="/main.12c3a04fa47641f902c2.js"></script>
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">QueinDecim</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">God in his heaven all's right with the world</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Local-environment-construction"><span class="nav-number">1.</span> <span class="nav-text">Local environment construction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Theme-configuration"><span class="nav-number">2.</span> <span class="nav-text">Theme configuration</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Installation-and-Usage"><span class="nav-number">2.1.</span> <span class="nav-text">Installation and Usage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Update"><span class="nav-number">2.2.</span> <span class="nav-text">Update</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Deploy-to-Github-pages"><span class="nav-number">3.</span> <span class="nav-text">Deploy to Github pages</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Start-your-writing"><span class="nav-number">4.</span> <span class="nav-text">Start your writing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Extend-packages"><span class="nav-number">5.</span> <span class="nav-text">Extend packages</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Reading-Information"><span class="nav-number">5.1.</span> <span class="nav-text">Reading Information</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Math-Expression"><span class="nav-number">5.2.</span> <span class="nav-text">Math Expression</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeff Wong"
+      src="/images/spike_smoke.jpg">
+  <p class="site-author-name" itemprop="name">Jeff Wong</p>
+  <div class="site-description" itemprop="description">本当の声は いつだって 正しい道を照らしてる</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">74</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MAGI003769" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MAGI003769" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/ruihao.wang.777" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;ruihao.wang.777" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.instagram.com/jeffwooong/" title="Instagram → https:&#x2F;www.instagram.com&#x2F;jeffwooong&#x2F;" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/p/1005052622574043/home?from=page_100505&mod=TAB#place" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052622574043&#x2F;home?from&#x3D;page_100505&amp;mod&#x3D;TAB#place" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://magi003769.github.io/post/hexo-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/spike_smoke.jpg">
+      <meta itemprop="name" content="Jeff Wong">
+      <meta itemprop="description" content="本当の声は いつだって 正しい道を照らしてる">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="QueinDecim">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          A guide for Hexo and Github pages
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-07-09 22:32:35" itemprop="dateCreated datePublished" datetime="2017-07-09T22:32:35-07:00">2017-07-09</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2020-05-10 22:20:49" itemprop="dateModified" datetime="2020-05-10T22:20:49-07:00">2020-05-10</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
+        </span>
+    </span>
+
+  
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>“Remember that the faith that moves mountains always carries a pick.” — Mark Twin</p>
+</blockquote>
+<p>This is the first post written in this blog which mainly recorded the construction of environment to use hexo. Following links can be good guide for use and understand.</p>
+<a id="more"></a>
+
+<ul>
+<li><a target="_blank" rel="noopener" href="https://linghucong.js.org/2016/04/15/2016-04-15-hexo-github-pages-blog/">手把手</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.jianshu.com/p/db7e64d86067">简书，起今之行</a></li>
+</ul>
+<h1 id="Local-environment-construction"><a href="#Local-environment-construction" class="headerlink" title="Local environment construction"></a>Local environment construction</h1><p>Such a construction can be divided into following steps:</p>
+<ol>
+<li>Install <a target="_blank" rel="noopener" href="https://nodejs.org/en/">nodejs</a> </li>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/">Git</a> is necessary</li>
+<li>Create a fold in a directory you prefer and then, under this directory, use commands in cmd (yes, the command line of windows)<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init &lt;name-of-bolg&gt;</span><br><span class="line">cd .\name-of-blog</span><br><span class="line">nmp install        # this step is crucial, only in this directory will the hexo work</span><br><span class="line">hexo g             # or hexo generate to create the public files</span><br><span class="line">hexo s -p 3600     # sometimes the default local host 4000 can be occupied</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h1 id="Theme-configuration"><a href="#Theme-configuration" class="headerlink" title="Theme configuration"></a>Theme configuration</h1><h2 id="Installation-and-Usage"><a href="#Installation-and-Usage" class="headerlink" title="Installation and Usage"></a>Installation and Usage</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">git clone &lt;the-url-of-theme-repository&gt; &lt;.\\themes\\name-of-theme&gt;</span><br></pre></td></tr></table></figure>
+<p>What should be emphasized here is that the name of configuration file should be modified to the correct form <code>_config.yml</code>. Additionally, it is necessary to edit theme feature in <code>_config.yml</code> for the whole project as well. After that, use command to investigate preview of blog where the theme has changed. </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br><span class="line">hexo s -p 3600</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd theme/&lt;name-of-theme&gt; # change working directory to the local repository for the theme</span><br><span class="line">git pull origin master # synchronize with origin</span><br></pre></td></tr></table></figure>
+<p>It is better to backup your  <code>_config.yml</code> file of the theme before starting update. </p>
+<h1 id="Deploy-to-Github-pages"><a href="#Deploy-to-Github-pages" class="headerlink" title="Deploy to Github pages"></a>Deploy to Github pages</h1><p>A special repository whose name is <strong>‘user-name.github.io’</strong> should be firstly created on Github and set the Github pages selections. Then, it is time to deploy the Hexo static blog to Github. <strong>Note that our construction must be done with in this folder.</strong> Otherwise, you cannot use Git to deploy your blog to Github pages.</p>
+<p>Make following modifications in <code>_config.yml</code> for the whole project</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: url of your special repository</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
+<p>In cmd, </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+<p>Every time you deploy the blog, it is equivalent to make a commit on the repository which means changes will occur on pages hosted by Github as well. Such a synchronization may not perfect as there might some delay for the update on Github page.</p>
+<p>In fact, before the command of deployment, we need to ensure the installation of an extension of Hexo:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Start-your-writing"><a href="#Start-your-writing" class="headerlink" title="Start your writing"></a>Start your writing</h1><p>Command <code>hexo n</code> will automatically create a .md file in <code>./source/_posts</code>. Your writing is just in those <code>.md</code> files. Actually, once the blog constructed, you just need create <code>.md</code> files for your posts.</p>
+<p>A new page can be created by <code>hexo new page &lt;page-name&gt;</code>. </p>
+<h1 id="Extend-packages"><a href="#Extend-packages" class="headerlink" title="Extend packages"></a>Extend packages</h1><p>This section is a collection of some required extend packages for different features. This really depends on your theme and their implementation. It is better to check documents of specified themes. Here is just a records.</p>
+<h2 id="Reading-Information"><a href="#Reading-Information" class="headerlink" title="Reading Information"></a>Reading Information</h2><p>Shown below the post title, read information contains a statistic of word count and an estimation of reading time. My current blog theme archer has this feature which depends on <code>hexo-wordcount</code>. Type following command to install this required package and add segment <code>reading_info: true</code> into theme configuration file. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install --save hexo-wordcount</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Math-Expression"><a href="#Math-Expression" class="headerlink" title="Math Expression"></a>Math Expression</h2><p>Sometimes, the rendering of formula in <code>.md</code> file using LaTex syntax can goes wrong. The solution is to use <code>Mathjax</code> and <code>Kramed</code> rather than <code>hexo-math</code> and <code>Marked</code>. This <a target="_blank" rel="noopener" href="https://nathaniel.blog/tutorials/make-hexo-support-math-again/">link</a> introduce us the solution step by step. </p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/emptyset110/article/details/50123231">搭建一个支持LaTEX的hexo博客</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"><i class="fa fa-tag"></i> Hexo</a>
+              <a href="/tags/Blog-Construction/" rel="tag"><i class="fa fa-tag"></i> Blog-Construction</a>
+              <a href="/tags/mathjax/" rel="tag"><i class="fa fa-tag"></i> mathjax</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/hello-world/" rel="prev" title="Hello World">
+                  <i class="fa fa-chevron-left"></i> Hello World
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/Python%E5%B0%8F%E7%88%AC%E8%99%AB%E2%80%94%E2%80%94%E7%BD%91%E9%A1%B5pdf%E6%96%87%E6%A1%A3%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD/" rel="next" title="Python小爬虫——网页pdf文档批量下载">
+                  Python小爬虫——网页pdf文档批量下载 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-bolt"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href="https://magi003769.github.io/"><b>Jeff Wong</b></a></span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
 </body>
 </html>
