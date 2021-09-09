@@ -40,7 +40,14 @@ button {
 
 .topnav-right {
     float: right;
+}
+
+.topnav-right a {
     color: grey;
+}
+
+.topnav-right a:hover {
+    color: black;
 }
 
 /* title section */
