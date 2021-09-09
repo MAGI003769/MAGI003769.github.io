@@ -1,0 +1,224 @@
+body {
+    margin: 0;
+    width: 100%;
+    font-family: 'Montserrat';
+}
+
+.graybackground {
+    position: fixed;
+    width: 100%;
+    filter: grayscale(100%);
+    z-index: -2;
+}
+
+.graybackground img {
+    width: 100%;
+    object-fit: cover;
+}
+
+button {
+    font-size: 2.5vh;
+    background-color: #f6d81c;
+    border: none;
+    padding: 2vmin;
+}
+
+/* nav bar */
+.topnav {
+    background-color: white;
+    align-items: center;
+    padding: 6vmin 10vmin 6vmin 10vmin;
+}
+
+.topnav a {
+    color: black;
+    font-size: 2.5vmin;
+    text-decoration: none;
+    padding-left: 2vmin;
+    padding-right: 2vmin;
+}
+
+.topnav-right {
+    float: right;
+    color: grey;
+}
+
+/* title section */
+#title {
+    position: relative;
+}
+
+#title img {
+    display: flex;
+    width: 100%;
+}
+
+#title #login {
+    position: absolute;
+    color: white;
+    background-color: #0b344f;
+    top: 15%;
+    left: 7.5%;
+    width: 25%;
+    padding-left: 6vmin;
+    padding-right: 6vmin;
+    padding-top: 10vmin;
+    padding-bottom: 10vmin;
+}
+
+#title #login p {
+    margin: 1vmin;
+}
+
+#title #login #upper {
+    font-size: 2vmin;
+}
+
+#title #login #slogan {
+    font-size: 5vmin;
+}
+
+#title #login #lower {
+    font-size: 2vmin;
+    font-style: italic;
+    color: #f6d81c;
+}
+
+#title #login input {
+    font-size: 5vmin;
+    width: 100%;
+    margin-top: 2vmin;
+    margin-bottom: 2vmin;
+}
+
+#title #login button {
+    margin-top: 2vmin;
+}
+
+/* feature section */
+#features {
+    display: flex;
+    background-color: white;
+    padding: 5% 10%;
+}
+
+#features .column {
+    float: left;
+    width: 30%;
+    color: black;
+    text-align: left;
+    margin: 5%
+}
+
+
+/* qoute section */
+#qoute {
+    color: black;
+    text-align: center;
+    background-color: #f3f3f3;
+    padding: 10% 20% 10% 20%;
+}
+
+#qoute #ceo {
+    font-weight: bolder;
+}
+
+
+/* pricing section */
+#prices {
+    position: relative;
+    text-align: center;
+    background-color: rgba(255,255,255,0.85);
+    padding: 5%;
+}
+
+#prices .plantitle {
+    font-weight: bold;
+    font-size: large;
+    margin: 0;
+}
+
+#prices #secondary {
+    color: dimgrey;
+}
+
+#prices #plans {
+    position: relative;
+    width: 100%;
+    display: flex;
+}
+
+#prices #plans .column {
+    color: black;
+    background-color: white;
+    padding: 5%;
+    width: 25%;
+    margin: 3%;
+    text-align: center;
+    background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('imgs/grid.png');
+}
+
+#prices #plans .column .pricetag {
+    font-size: 4vmin;
+    font-weight: bolder;
+    margin-top: 8vmin;
+}
+
+#prices #plans .column button {
+    color: white;
+    font-size: 2vmin;
+    background-color: #0b344f;
+}
+
+/* try section */
+#try {
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    background-image: linear-gradient(rgba(4, 21, 32, 0.7), rgba(4, 21, 32, 0.7)), url("imgs/notebook.jpeg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    padding-top: 15%;
+    padding-bottom: 15%;
+    color: white;
+}
+
+#try p {
+    margin: 1vh;
+}
+
+#try #tryslogan {
+    font-size: 5vh;
+}
+
+#try #tellmore {
+    font-size: 3vh;
+}
+
+#try button {
+    margin-top: 3vh;
+    padding-left: 3vh;
+    padding-right: 4vh;
+}
+
+/* contact section */
+#contact {
+    position: relative;
+    color: white;
+    text-align: center;
+    background-color: #1b212b;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+#contact #socialmedia a {
+    text-decoration: none;
+}
+
+#contact #socialmedia a img {
+    width: 2%;
+    margin-top: 3%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
