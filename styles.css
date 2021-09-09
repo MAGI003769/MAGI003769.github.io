@@ -121,9 +121,10 @@ button {
 /* qoute section */
 #qoute {
     color: black;
+    width: 100%;
     text-align: center;
     background-color: #f3f3f3;
-    padding: 10% 20% 10% 20%;
+    padding: 10%;
 }
 
 #qoute #ceo {
