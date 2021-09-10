@@ -164,7 +164,7 @@ button {
     width: 25%;
     margin: 3%;
     text-align: center;
-    background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('imgs/grid.png');
+    background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('http://csci571.com/hw/hw3/images/grid.png');
 }
 
 #prices #plans .column .pricetag {
@@ -184,7 +184,7 @@ button {
     overflow: hidden;
     position: relative;
     text-align: center;
-    background-image: linear-gradient(rgba(4, 21, 32, 0.7), rgba(4, 21, 32, 0.7)), url("imgs/notebook.jpeg");
+    background-image: linear-gradient(rgba(4, 21, 32, 0.7), rgba(4, 21, 32, 0.7)), url("http://csci571.com/hw/hw3/images/notebook.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
