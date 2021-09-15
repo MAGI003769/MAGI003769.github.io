@@ -1,16 +1,19 @@
-.table {
-    content: center;
-    width: 80%;  
-    border-collapse: collapse;
-    text-align: left;
+body {
+    margin: 0;
+    font-size: large;
 }
 
-.row {
-    margin: 0;
+.table {
+    width: 60%;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
 }
 
 .cell {
     margin: 0;
+    padding: 4px;
     border: 5px solid black;
     border-bottom: 5px solid black;
 }
