@@ -1,0 +1,16 @@
+.table {
+    content: center;
+    width: 80%;  
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.row {
+    margin: 0;
+}
+
+.cell {
+    margin: 0;
+    border: 5px solid black;
+    border-bottom: 5px solid black;
+}
